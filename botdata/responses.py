@@ -1,4 +1,4 @@
-import discord 
+import discord
 from discord.ext import commands
 
 intents = discord.Intents.default()
@@ -6,46 +6,71 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix='$', intents=intents)
 
-curse_words = ['shit', 'fuck']
+curse_words = []
 word_counts = {}
 
-## for server messages 
+async def get_response(user_message: str) -> str:
+    return 'Hello, I am ProfanityBot. I am here to help. How can I help?'
+
+async def handle_response(user_message: str) -> str:
+    return 'Hello, I am ProfanityBot. I am here to help. How can I help?'
+
+@bot.event
+async def on_guild_join(guild):
+    print(f'Joined server: {guild.name}')
+    for channel in guild.text_channels:
+        if channel.permissions_for(guild.me).send_messages:
+            welcome_message = ('Hello, I am ProfanityBot. I am here to help moderate your server to ensure that everyone is having a good and safe time.')
+            await channel.send(welcome_message)
+        break
+    
+@bot.command()
+async def add_swear(ctx, word: str):
+    if word in curse_words: 
+        await ctx.send(f'{word} is already in the list of curse words.')
+        return
+    curse_words.append(word)
+
+    await ctx.send(f'{word} has been added to the list of curse words.')
+
+@bot.command(name='remove_swear')
+async def remove_swear(ctx, word: str):
+    if word not in curse_words:
+        await ctx.send(f'{word} is not in the list of curse words.')
+        return
+    curse_words.remove(word)
+
+    await ctx.send(f'{word} has been removed from the list of curse words.')
+
+@bot.command(name='list_swear')
+async def list_swear(ctx):
+    await ctx.send(f'Curse words: {curse_words}')
+
+@bot.command(name='count_swear')
+async def count_swear(ctx):
+    await ctx.send(f'Curse word counts: {word_counts}')
 
 @bot.event
 async def on_message(message):
-    if message.author == bot.user:
-        return 
+    user_message = message.content.lower()
+    author = message.author
+
+    # Prevent the bot from replying to its own messages
+    if author == bot.user:
+        return
+
+    # Check for curse words and count them
+    words = user_message.split()
+    found_curse_words = [word for word in words if word in curse_words]
     
-    if message.content.lower() in curse_words:
-        await message.channel.send(f'{message.author.mention}, you have been warned for using a curse word. ')
-        if message.author.id in word_counts:
-            word_counts[message.author.id] += 1
-        else:
-            word_counts[message.author.id] = 1
-        if word_counts[message.author.id] == 3:
-            await message.channel.send(f'{message.author.mention} has been kicked for using a curse word. ')
-            await message.author.kick(reason='Using a curse word')
-            del word_counts[message.author.id]
+    if found_curse_words:
+        if author.name not in word_counts:
+            word_counts[author.name] = 0
+        word_counts[author.name] += len(found_curse_words)
+        await message.channel.send(f'Warning {author.name}, please avoid using inappropriate language.')
+
+    # Ensure commands are still processed
     await bot.process_commands(message)
 
-
-## for DMs
-
-def handle_response(message) -> str:
-    p_message = message.lower()
-
-    if p_message == 'hello':
-        return 'Hello, thanks for using the ProfanityBot!'
-    
-    if p_message == 'how are you?':
-        return 'I am a bot, so I do not have feelings, but thank you for asking!'
-    
-    if p_message == 'can i swear?':
-        return 'Please do not swear.'
-    
-
-    if p_message == '$help':
-        return 'This is a message you can modify'
-    
-
-    return 'I am a bot, so I do not understand that message. More commands will be updated soon I believe.'
+# Ensure you add the bot token here
+bot.run('YOUR_BOT_TOKEN')

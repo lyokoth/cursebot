@@ -1,19 +1,23 @@
 import discord 
+import os
+from dotenv import load_dotenv
 
 
-class Client:
+class Client(discord.Client):
     async def on_message(self, message):
         if message.author == self.user:
             return 
 
 
-        if message.content.startsWith('$hello'):
+        if message.content.startswith('$hello'):
             await message.channel.send('Welcome back!')
 
-        elif message.content.startsWith('$how are you?'):
-            await message.channel.send('I am a bot, so I do not have feelings, but thank you for asking!')
     
     async def on_ready(self):
-        print(f'{self.user} has connected to Discord!')
+        print(f'{self.user} is now connected to Discord!')
         await self.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name='for curse words'))
-        
+
+
+client = Client(intents=discord.Intents.default())
+client.run('BOT_TOKEN')
+
