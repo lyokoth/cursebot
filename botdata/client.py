@@ -15,7 +15,7 @@ class Client(discord.Client):
     
     async def on_ready(self):
         print(f'{self.user} is now connected to Discord!')
-        await self.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name='for curse words'))
+        await self.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name='for swear words'))
 
 
 client = Client(intents=discord.Intents.default())

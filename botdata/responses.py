@@ -12,8 +12,6 @@ word_counts = {}
 async def get_response(user_message: str) -> str:
     return 'Hello, I am ProfanityBot. I am here to help. How can I help?'
 
-async def handle_response(user_message: str) -> str:
-    return 'Hello, I am ProfanityBot. I am here to help. How can I help?'
 
 @bot.event
 async def on_guild_join(guild):
@@ -68,9 +66,10 @@ async def on_message(message):
             word_counts[author.name] = 0
         word_counts[author.name] += len(found_curse_words)
         await message.channel.send(f'Warning {author.name}, please avoid using inappropriate language.')
-
+        await message.delete()
     # Ensure commands are still processed
     await bot.process_commands(message)
+    await message.channel.send(f'{author.name}, stop using inappropriate language.')
 
 # Ensure you add the bot token here
 bot.run('YOUR_BOT_TOKEN')

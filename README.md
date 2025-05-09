@@ -12,9 +12,7 @@ A discord bot that can censor curse words so everyone can have a good time!
 2. [Setup Instructions](#setup-instructions)
 3. [Bot Commands](#bot-commands)
 4. [Events Handled by the Bot](#events-handled-by-the-bot)
-5. [Error Handling](#error-handling)
-6. [Customization and Contribution](#customization-and-contribution)
-7. [License](#license)
+5. [Future Features](#future-features)
 
 ### Introduction
 
